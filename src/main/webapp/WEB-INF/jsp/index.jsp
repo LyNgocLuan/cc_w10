@@ -54,6 +54,7 @@
 								<th>Id</th>
 								<th>Title</th>
 								<th>Content</th>
+								<th>URL</th>
 								<th></th>
 								<th></th>
 							</tr>
@@ -64,6 +65,7 @@
 									<td>${content.id}</td>
 									<td>${content.tittle}</td>
 									<td>${content.cont}</td>
+									<td>${content.url}</td>
 									<td><a href="update-content?id=${content.id}"><span class="glyphicon glyphicon-pencil"></span></a></td>
 									<td><a href="delete-content?id=${content.id}"><span class="glyphicon glyphicon-trash"></span></a></td>
 								</tr>
@@ -94,6 +96,28 @@
 					<div class="form-group">
 						<input type="submit" class="btn btn-primary" value="Save"/>
 					</div>
+					
+					<div th:if="${message}">
+						<h2 th:text="${message}"/>
+					</div>
+				
+					<div>
+						<form method="POST" enctype="multipart/form-data" action="/">
+							<table>
+								<tr><td>File to upload:</td><td><input type="file" name="file" /></td></tr>
+								<tr><td></td><td><input type="submit" value="Upload" /></td></tr>
+							</table>
+						</form>
+					</div>
+				
+					<div>
+						<ul>
+							<li th:each="file : ${files}">
+								<a th:href="${file}" th:text="${file}" />
+							</li>
+						</ul>
+					</div>
+										
 				</form>
 			</div>
 		</c:when>		
