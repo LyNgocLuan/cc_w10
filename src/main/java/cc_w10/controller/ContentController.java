@@ -1,64 +1,115 @@
 package cc_w10.controller;
 
-import javax.servlet.http.HttpServletRequest;
-
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import cc_w10.dao.Respository;
 import cc_w10.model.Content;
-import cc_w10.service.ContentService;
+import cc_w10.service.StorageFileNotFoundException;
+import cc_w10.service.StorageService;
+import cc_w10.service.UploadService;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.websocket.server.PathParam;
 
 @Controller
 public class ContentController {
-	
+
 	@Autowired
-	private ContentService contentService;
-	
+	private Respository contentDao;
+
+	private final StorageService storageService;
+
+	@Autowired
+	public ContentController(StorageService storageService) {
+		this.storageService = storageService;
+	}
+
 	@GetMapping("/")
-	public String home(HttpServletRequest request){
-		request.setAttribute("mode", "MODE_HOME");
+	public String listUploadedFiles(Model model) throws IOException {
+
+		model.addAttribute("files",
+				storageService.loadAll()
+						.map(path -> MvcUriComponentsBuilder
+								.fromMethodName(ContentController.class, "serveFile", path.getFileName().toString())
+								.build().toString())
+						.collect(Collectors.toList()));
+		Content content = new Content();
+		model.addAttribute("content", content);
 		return "index";
 	}
-	
-	@GetMapping("/all-contents")
-	public String allContents(HttpServletRequest request){
-		request.setAttribute("contents", contentService.findAll());
-		request.setAttribute("mode", "MODE_CONTENTS");
+
+	@GetMapping("/files/{filename:.+}")
+	@ResponseBody
+	public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
+		Resource file = storageService.loadAsResource(filename);
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+				.body(file);
+	}
+
+	@PostMapping("/")
+	public String handleFileUpload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes)
+			throws IllegalStateException, IOException {
+
+		File convFile = storageService.store(file);
+
+		UploadService service = new UploadService();
+		String url = service.Upload(convFile);
+
+		redirectAttributes.addFlashAttribute("message",
+				"You successfully uploaded " + file.getOriginalFilename() + "! And Uploaded to Drive View: " + url);
+		return "redirect:/";
+	}
+
+	@ExceptionHandler(StorageFileNotFoundException.class)
+	public ResponseEntity handleStorageFileNotFound(StorageFileNotFoundException exc) {
+		return ResponseEntity.notFound().build();
+	}
+
+	@GetMapping("/{id}")
+	public String findById(@PathVariable("id") Integer id, Model model) {
+		Content content = contentDao.findOne(id);
+		model.addAttribute("content", content);
 		return "index";
 	}
-	
-	@GetMapping("/new-content")
-	public String newContent(HttpServletRequest request){
-		request.setAttribute("mode", "MODE_NEW");
+
+	@RequestMapping("insert")
+	public String insert(ModelMap model, @ModelAttribute("content") Content content,
+			@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) throws IOException {
+		System.out.println(content.getTittle());
+
+		File convFile = storageService.store(file);
+
+		UploadService service = new UploadService();
+		String url = service.Upload(convFile);
+
+		redirectAttributes.addFlashAttribute("message",
+				"You successfully uploaded " + file.getOriginalFilename() + "! And Uploaded to Drive View: " + url);
+		content.setUrl(url);
+		contentDao.save(content);
+		System.out.println(content.getId());
 		return "index";
 	}
-	
-	@PostMapping("/save-content")
-	public String saveContent(@ModelAttribute Content content, BindingResult bindingResult, HttpServletRequest request){
-		contentService.save(content);
-		request.setAttribute("contents", contentService.findAll());
-		request.setAttribute("mode", "MODE_CONTENTS");
-		return "index";
+
+	@ModelAttribute("contents")
+	public List<Content> getContents() {
+		return (List<Content>) contentDao.findAll();
 	}
-	
-	@GetMapping("/update-content")
-	public String updateContent(@RequestParam int id, HttpServletRequest request){
-		request.setAttribute("content", contentService.findContent(id));
-		request.setAttribute("mode", "MODE_UPDATE");
-		return "index";
-	}
-	
-	@GetMapping("/delete-content")
-	public String deleteContent(@RequestParam int id, HttpServletRequest request){
-		contentService.delete(id);
-		request.setAttribute("contents", contentService.findAll());
-		request.setAttribute("mode", "MODE_CONTENTS");
-		return "index";
-	}
-	
 }

@@ -15,13 +15,16 @@ public class Content implements Serializable{
 	
 	private String tittle;	
 	private String cont;
+	private String url;
+	
 	
 	public Content(){}
 	
-	public Content(String tittle, String cont) {
+	public Content(String tittle, String cont, String url) {
 		super();
 		this.tittle = tittle;
 		this.cont = cont;
+		this.url = url;
 	}
 	public int getId() {
 		return id;
@@ -41,10 +44,16 @@ public class Content implements Serializable{
 	public void setCont(String cont) {
 		this.cont = cont;
 	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	
 	@Override
 	public String toString() {
-		return "Content [id=" + id + ", tittle=" + tittle + ", cont=" + cont + "]";
-	}	
-	
-	
+		return "Content [id=" + id + ", tittle=" + tittle + ", cont=" + cont + ", url=" + url +"]";
+	}		
+
 }
