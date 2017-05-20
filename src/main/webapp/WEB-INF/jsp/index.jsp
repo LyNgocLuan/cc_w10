@@ -38,6 +38,19 @@
 
 </head>
 <body>
+
+	<div role="navigation">
+		<div class="navbar navbar-inverse">
+			<a href="/" class="navbar-brand">Content Manager</a>
+			<div class="navbar-collapse collapse">
+				<ul class="nav navbar-nav">
+					<li><a href="new-content">New Post</a></li>
+					<li><a href="all-contents">All Posts</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
 	<!-- /.container -->
 	<div id="wrapper" style="padding: 10px">
 		<h1>

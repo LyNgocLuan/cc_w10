@@ -18,6 +18,7 @@ import cc_w10.dao.Respository;
 import cc_w10.model.Content;
 import cc_w10.service.StorageFileNotFoundException;
 import cc_w10.service.StorageService;
+import cc_w10.service.UploadS3;
 import cc_w10.service.UploadService;
 
 import java.io.File;
@@ -92,19 +93,20 @@ public class ContentController {
 
 	@RequestMapping("insert")
 	public String insert(ModelMap model, @ModelAttribute("content") Content content,
-			@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) throws IOException {
+			@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) throws IOException, InterruptedException {
 		System.out.println(content.getTittle());
 
 		File convFile = storageService.store(file);
 
-		UploadService service = new UploadService();
-		String url = service.Upload(convFile);
+		UploadS3 service = new UploadS3();
+		String url = service.upload(convFile);
 
 		redirectAttributes.addFlashAttribute("message",
 				"You successfully uploaded " + file.getOriginalFilename() + "! And Uploaded to Drive View: " + url);
 		content.setUrl(url);
 		contentDao.save(content);
-		System.out.println(content.getId());
+		System.out.println(content.getId());		
+		
 		return "index";
 	}
 

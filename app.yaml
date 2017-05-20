@@ -1,5 +1,2 @@
 env: flex
-runtime: php
-runtime_config:
-  document_root: .
-health_check: enable_health_check: False
+runtime: java

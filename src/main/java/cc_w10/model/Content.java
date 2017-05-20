@@ -26,6 +26,7 @@ public class Content implements Serializable{
 		this.cont = cont;
 		this.url = url;
 	}
+	
 	public int getId() {
 		return id;
 	}
@@ -50,10 +51,5 @@ public class Content implements Serializable{
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	
-	@Override
-	public String toString() {
-		return "Content [id=" + id + ", tittle=" + tittle + ", cont=" + cont + ", url=" + url +"]";
-	}		
 
 }
