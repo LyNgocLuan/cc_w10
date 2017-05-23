@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import cc_w10.dao.Respository;
 import cc_w10.model.Content;
+import cc_w10.service.ContentService;
 import cc_w10.service.StorageFileNotFoundException;
 import cc_w10.service.StorageService;
 import cc_w10.service.UploadS3;
@@ -27,6 +28,7 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 
 @Controller
@@ -36,6 +38,7 @@ public class ContentController {
 	private Respository contentDao;
 
 	private final StorageService storageService;
+	private ContentService contentService;
 
 	@Autowired
 	public ContentController(StorageService storageService) {
@@ -43,8 +46,15 @@ public class ContentController {
 	}
 
 	@GetMapping("/")
-	public String listUploadedFiles(Model model) throws IOException {
-
+	public String listUploadedFiles(Model model, HttpServletRequest request) throws IOException {		
+		Content content = new Content();
+		model.addAttribute("content", content);
+		request.setAttribute("mode", "MODE_CONTENTS");
+		return "index";
+	}
+	
+	/*@GetMapping("/all-contents")
+	public String allContents(Model model, HttpServletRequest request){
 		model.addAttribute("files",
 				storageService.loadAll()
 						.map(path -> MvcUriComponentsBuilder
@@ -53,8 +63,9 @@ public class ContentController {
 						.collect(Collectors.toList()));
 		Content content = new Content();
 		model.addAttribute("content", content);
+		request.setAttribute("mode", "MODE_INS");
 		return "index";
-	}
+	}*/
 
 	@GetMapping("/files/{filename:.+}")
 	@ResponseBody
@@ -65,10 +76,10 @@ public class ContentController {
 				.body(file);
 	}
 
-	@PostMapping("/")
-	public String handleFileUpload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes)
+	/*@PostMapping("/")
+	public String handleFileUpload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes, HttpServletRequest request)
 			throws IllegalStateException, IOException {
-
+		
 		File convFile = storageService.store(file);
 
 		UploadService service = new UploadService();
@@ -76,8 +87,9 @@ public class ContentController {
 
 		redirectAttributes.addFlashAttribute("message",
 				"You successfully uploaded " + file.getOriginalFilename() + "! And Uploaded to Drive View: " + url);
+		request.setAttribute("mode", "MODE_CONTENTS");
 		return "redirect:/";
-	}
+	}*/
 
 	@ExceptionHandler(StorageFileNotFoundException.class)
 	public ResponseEntity handleStorageFileNotFound(StorageFileNotFoundException exc) {
@@ -85,14 +97,15 @@ public class ContentController {
 	}
 
 	@GetMapping("/{id}")
-	public String findById(@PathVariable("id") Integer id, Model model) {
+	public String findById(@PathVariable("id") Integer id, Model model, HttpServletRequest request) {
 		Content content = contentDao.findOne(id);
 		model.addAttribute("content", content);
+		request.setAttribute("mode", "MODE_NEWS");
 		return "index";
 	}
 
 	@RequestMapping("insert")
-	public String insert(ModelMap model, @ModelAttribute("content") Content content,
+	public String insert(ModelMap model, @ModelAttribute("content") Content content, HttpServletRequest request,
 			@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) throws IOException, InterruptedException {
 		System.out.println(content.getTittle());
 
@@ -102,11 +115,11 @@ public class ContentController {
 		String url = service.upload(convFile);
 
 		redirectAttributes.addFlashAttribute("message",
-				"You successfully uploaded " + file.getOriginalFilename() + "! And Uploaded to Drive View: " + url);
+				"You successfully uploaded " + file.getOriginalFilename() + "! And Uploaded to AWS S3: " + url);
+		request.setAttribute("mode", "MODE_CONTENTS");
 		content.setUrl(url);
 		contentDao.save(content);
 		System.out.println(content.getId());		
-		
 		return "index";
 	}
 

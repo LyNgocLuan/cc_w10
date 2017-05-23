@@ -36,6 +36,30 @@
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 
+<style>
+	#small{
+		width: 100;
+	}
+	.summary {
+	  display: table-cell;
+	  /*l&f*/
+	  /* one line */
+	  overflow: hidden;
+	  /* make text overflow */
+	  text-overflow: ellipsis;
+	  /* truncate texT with ... */
+	}
+	/*td div {
+	  overflow: hidden;
+	  text-overflow: ellipsis;
+	  white-space: inherit;
+	}*/
+    .table1{
+    margin-left:100;
+    margin-right:100; 
+    }
+    
+</style>
 </head>
 <body>
 
@@ -44,13 +68,14 @@
 			<a href="/" class="navbar-brand">Content Manager</a>
 			<div class="navbar-collapse collapse">
 				<ul class="nav navbar-nav">
-					<li><a href="new-content">New Post</a></li>
-					<li><a href="all-contents">All Posts</a></li>
+					<li><a href="/${content.id }">All Posts</a></li>
 				</ul>
 			</div>
 		</div>
 	</div>
-
+	<c:choose>
+	<c:when test="${mode == 'MODE_CONTENTS' }">
+	
 	<!-- /.container -->
 	<div id="wrapper" style="padding: 10px">
 		<h1>
@@ -61,7 +86,7 @@
 				modelAttribute="content" role="form">
 				<div class="form-group">
 					<label for="tittle">Title</label>
-					<form:input path="tittle" cssClass="form-control" />
+					<form:input path="tittle" cssClass="form-control" id="small" />
 				</div>
 				<div id="editor">
 					<label for="content">Content</label>
@@ -81,32 +106,67 @@
 				<center>
 					<button class="btn btn-success btn-lg" data-action="insert">Upload</button>
 			</form:form>
+			
 			${message}
-
-			<h1 class="text-center">List Upload</h1>
-			<table class="table table-default">
-				<tr>
-					<th>Id</th>
-					<th>Title</th>
-					<th>Content</th>
-					<th>Url</th>
-					<th></th>
-				</tr>
-				<c:forEach var="c" items="${contents}">
-					<tr class="nn-record">
-						<td>${c.id}</td>
-						<td>${c.tittle}</td>
-						<td>${c.cont}</td>
-						<td>${c.url}</td>
-						<%-- <td><a href="/${c.id}">Chi tiết</a></td> --%>
-					</tr>
-				</c:forEach>
-			</table>
-
+				
 		</div>
 	</div>
-
-
+	</c:when> 
+		<c:when test="${mode == 'MODE_NEWS' }">
+			<div id="wrapper">
+				<div class="content">
+				<table border="0px" style="margin-bottom: 100">
+					<tr>
+						<th width="380px"></th>
+						<th></th>
+					</tr>
+					<c:forEach var="c" items="${contents}"><!-- day nay  -->						
+						<tr class="nn-record">
+							<td></td>
+							<td></td>
+							<td width="300"><h1>${c.tittle}</h1></td>
+							<td></td>						
+							<td></td>
+						</tr>
+						<tr class="nn-record">
+							<td></td>
+							<td></td>
+							<td width="10">${c.cont}</td>
+							<td></td>						
+							<td></td>
+						</tr>
+						<tr class="nn-record">
+							<td></td>
+							<td></td>
+							<td width="600"><img src="${c.url}" width="600" height="300"></td>
+							<td></td>						
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td width="600" style="text-align: center">For full image click <a href="${c.url }">here</a></td>
+							<td></td>						
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td width="600" style="text-align: center">----------------------------------------------------------</td>
+							<td></td>						
+							<td></td>
+						</tr>
+					</c:forEach>
+					<tr>
+						<th width="380px"></th>
+						<th></th>
+					</tr>
+				</table>
+				</div>
+			</div>
+		</c:when>
+	</c:choose>
+	
 	<script type="text/javascript"
 		src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script type="text/javascript"

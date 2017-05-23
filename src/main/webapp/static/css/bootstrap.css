@@ -220,7 +220,7 @@ th {
   }
   thead {
     display: table-header-group;
-  }
+  }f
   tr,
   img {
     page-break-inside: avoid;
@@ -250,6 +250,8 @@ th {
   }
   .table {
     border-collapse: collapse !important;
+    margin-left: 100px;
+    margin-right: 100px;
   }
   .table td,
   .table th {
