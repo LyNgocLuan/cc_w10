@@ -15,8 +15,8 @@ public class UploadS3 {
 	private static final String folderName = "Folder 1";
 	public String upload(File filePath) throws IOException {
 		AWSCredentials credentials = new BasicAWSCredentials(
-				"AKIAJUVXDFSD5OQYAKXQ", 
-				"mDo0YJoP5Pq8Nit85j45d3bRjOk73Sg/dh8ocBjq");
+				"AKIAJOTLRL7UNHNHHADQ", 
+				"V4hRHJFcOzBiFJTUStf/YdWtIrfkSjIrs6kBuvEs");
 		
 		// create a client connection based on credentials
 		AmazonS3 s3client = new AmazonS3Client(credentials);				
