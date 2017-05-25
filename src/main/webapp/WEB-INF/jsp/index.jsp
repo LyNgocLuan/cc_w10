@@ -131,14 +131,14 @@
 						<tr class="nn-record">
 							<td></td>
 							<td></td>
-							<td width="10">${c.cont}</td>
+							<td width="300">${c.cont}</td>
 							<td></td>						
 							<td></td>
 						</tr>
 						<tr class="nn-record">
 							<td></td>
 							<td></td>
-							<td width="600"><img src="${c.url}" width="600" height="300"></td>
+							<td width="600"><img src="${c.url}" width="550" height="400"></td>
 							<td></td>						
 							<td></td>
 						</tr>
