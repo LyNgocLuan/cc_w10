@@ -14,7 +14,7 @@ public class SapmpleRestController {
 	@Autowired
 	private ContentService contentService;
 	
-	/*@GetMapping("/hello")
+	@GetMapping("/hello")
 	public String hello(){
 		return "Hello";
 	}
@@ -24,11 +24,11 @@ public class SapmpleRestController {
 	}
 	
 	@GetMapping("/save-content")
-	public String saveContent(@RequestParam String tittle, @RequestParam String content){
-		Content article = new Content(tittle, content);
+	public String saveContent(@RequestParam String tittle, @RequestParam String content, @RequestParam String url){
+		Content article = new Content(tittle, content, url);
 		contentService.save(article);
 		return "Saved";
-	}*/
+	}
 	
 	
 }
